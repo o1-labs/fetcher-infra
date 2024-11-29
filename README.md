@@ -1,4 +1,4 @@
-# Infrastructure for the fetcher and data persistence
+# Infrastructure for the logs fetcher and data persistence
 
 ## Pre-requisites
 
