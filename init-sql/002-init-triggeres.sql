@@ -152,7 +152,7 @@ insert into
               where
                 p.block_trace_id = block_trace_id_
                 and p.resource = 'Snark_work'
-            )
+            ) AS sub
         ) RETURNING *;
 
 END;
@@ -227,7 +227,7 @@ insert into
         where
           p.block_trace_id = block_trace_id_
           and p.resource = 'Transaction_diff'
-      )
+      ) AS sub
   ) RETURNING *;
 
 END;
@@ -334,7 +334,7 @@ insert into
       txs.value ->> 0,
       txs.value ->> 2,
       to_timestamp(new.trace_started_at),
-      txs.value #>>'{3,0}'
+      txs.value #>> '{3,0}'
     FROM
       jsonb_array_elements(new.metadata_json -> 'transactions') txs
     WHERE
