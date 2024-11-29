@@ -1,0 +1,50 @@
+version: "3.8"
+
+networks:
+  o1labs-fetcher:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
+    container_name: postgres
+    restart: always
+    command: "-c max_connections=10000 -c shared_buffers=2048MB"
+    networks:
+      - ${NETWORK_NAME}
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    shm_size: 1g
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-sql:/docker-entrypoint-initdb.d
+      - "/etc/localtime:/etc/localtime:ro"
+
+  log-fetcher:
+    depends_on:
+      - postgres
+    image: gcr.io/o1labs-192920/mina-internal-trace-consumer:1.3.0
+    container_name: log-fetcher
+    restart: always
+    command: "fetcher -k /keys/fetcher_sk -o /output --db-uri 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}' discovery"
+    networks:
+      - ${NETWORK_NAME}
+    ports:
+      - "4000:4000"
+      - "11000-11700:11000-11700"
+    volumes:
+      - ./keys:/keys
+      - ./output:/output
+      - ./names-data:/names-data
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      INTERNAL_TRACE_CONSUMER_EXE: /internal_trace_consumer
+      FETCH_INTERVAL_MS: 10000
+      ONLINE_URL: ${UPTIME_BACKEND_API_URL}
+
+volumes:
+  postgres_data:
