@@ -16,7 +16,7 @@ create table if not exists last_block_trace_gossip_checkpoint (
 );
 
 CREATE
-OR REPLACE function gossip_traces_trigger() returns trigger AS $ $ DECLARE nresource resource_t;
+OR REPLACE function gossip_traces_trigger() returns trigger AS $$ DECLARE nresource resource_t;
 
 naction pool_action_t;
 
@@ -66,7 +66,7 @@ RETURN NEW;
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 create
 or replace trigger gossip_traces_on_add before
@@ -114,7 +114,7 @@ create table sw_traces (
 CREATE UNIQUE INDEX sw_traces_id ON sw_traces (block_trace_checkpoint_id);
 
 CREATE
-OR REPLACE function sw_traces_add(id bigint, block_trace_id_ int4, metadata jsonb) returns setof sw_traces AS $ $ begin return query
+OR REPLACE function sw_traces_add(id bigint, block_trace_id_ int4, metadata jsonb) returns setof sw_traces AS $$ begin return query
 insert into
   sw_traces (
     block_trace_checkpoint_id,
@@ -157,10 +157,10 @@ insert into
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 CREATE
-OR REPLACE function sw_traces_trigger() returns trigger AS $ $ begin
+OR REPLACE function sw_traces_trigger() returns trigger AS $$ begin
 UPDATE
   block_trace_checkpoint bt
 SET
@@ -182,7 +182,7 @@ RETURN NULL;
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 create
 or replace trigger sw_traces_on_add
@@ -197,7 +197,7 @@ insert
   ) execute function sw_traces_trigger();
 
 CREATE
-OR REPLACE function tx_traces_add(id bigint, block_trace_id_ int4, metadata jsonb) returns setof tx_traces AS $ $ begin return query
+OR REPLACE function tx_traces_add(id bigint, block_trace_id_ int4, metadata jsonb) returns setof tx_traces AS $$ begin return query
 insert into
   tx_traces (
     block_trace_checkpoint_id,
@@ -232,10 +232,10 @@ insert into
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 CREATE
-OR REPLACE function tx_traces_trigger() returns trigger AS $ $ begin
+OR REPLACE function tx_traces_trigger() returns trigger AS $$ begin
 UPDATE
   block_trace_checkpoint bt
 SET
@@ -257,7 +257,7 @@ RETURN NULL;
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 create
 or replace trigger tx_traces_on_add
@@ -326,7 +326,7 @@ create table block_txs (
 );
 
 CREATE
-OR REPLACE function block_txs_trigger() returns trigger AS $ $ begin
+OR REPLACE function block_txs_trigger() returns trigger AS $$ begin
 insert into
   block_txs as bt (hash, type, memo, block_received, result) (
     SELECT
@@ -349,7 +349,7 @@ RETURN NULL;
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 create
 or replace trigger block_trace_handle_txs
@@ -372,7 +372,7 @@ create table unique_txs (
 create index unique_txs_memo on unique_txs (memo);
 
 CREATE
-OR REPLACE function unique_txs_trigger() returns trigger AS $ $ begin
+OR REPLACE function unique_txs_trigger() returns trigger AS $$ begin
 insert into
   unique_txs as ut (type, hash, memo, time) (
     select
@@ -391,7 +391,7 @@ RETURN NULL;
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 create
 or replace trigger tx_traces_handle_txs
@@ -508,7 +508,7 @@ order by
   first_tx_time;
 
 CREATE
-OR REPLACE function block_trace_update_started_at_trigger() returns trigger AS $ $ begin
+OR REPLACE function block_trace_update_started_at_trigger() returns trigger AS $$ begin
 update
   block_trace
 set
@@ -523,7 +523,7 @@ RETURN NULL;
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 create
 or replace trigger block_trace_update_started_at
@@ -545,7 +545,7 @@ insert
   ) execute function block_trace_update_started_at_trigger();
 
 CREATE
-OR REPLACE function block_trace_update_status_trigger() returns trigger AS $ $ begin if new.name = 'Breadcrumb_integrated' then
+OR REPLACE function block_trace_update_status_trigger() returns trigger AS $$ begin if new.name = 'Breadcrumb_integrated' then
 update
   block_trace
 set
@@ -568,7 +568,7 @@ RETURN NULL;
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 create
 or replace trigger block_trace_update_status
@@ -583,7 +583,7 @@ insert
   ) execute function block_trace_update_status_trigger();
 
 CREATE
-OR REPLACE function block_trace_update_source_trigger() returns trigger AS $ $ declare new_source varchar(16);
+OR REPLACE function block_trace_update_source_trigger() returns trigger AS $$ declare new_source varchar(16);
 
 begin if new.name = 'External_block_received' then new_source = 'External';
 
@@ -607,7 +607,7 @@ RETURN NULL;
 
 END;
 
-$ $ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 create
 or replace trigger block_trace_update_source
