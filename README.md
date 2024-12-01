@@ -1,4 +1,4 @@
-# Infrastructure for the logs fetcher and data persistence
+# Infrastructure for the logs fetcher and data persistence components (experimental)
 
 ## Pre-requisites
 
