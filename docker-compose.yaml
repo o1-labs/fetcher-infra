@@ -47,11 +47,11 @@ services:
       FETCH_INTERVAL_MS: 5000
       ONLINE_URL: ${UPTIME_BACKEND_API_URL}
 
-  mina-frontend:
+  dashboard:
     depends_on:
       - log-fetcher
-    image: o1labs/mina:mina-frontend
-    container_name: mina-frontend
+    image: o1labs/mina:dashboard
+    container_name: dashboard
     restart: always
     networks:
       - ${NETWORK_NAME}
