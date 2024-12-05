@@ -44,6 +44,7 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
     environment:
       INTERNAL_TRACE_CONSUMER_EXE: /internal_trace_consumer
+      HANDLE_STATUS_CHANGE: true
       FETCH_INTERVAL_MS: 5000
       ONLINE_URL: ${UPTIME_BACKEND_API_URL}
 
