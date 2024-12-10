@@ -416,30 +416,32 @@ from
 
 create
 or replace view experiments as with txs_ as (
-  SELECT
-    split_part(memo, '-', -2) exp,
+  select
+    split_part(memo, '-', -2) as exp,
     cast(
       nullif(
         regexp_replace(split_part(memo, '-', -1), '[^\d]', ''),
         ''
       ) as int
-    ) round,
+    ) as round,
     *
   from
     txs
+  where
+    memo like '%-%' -- Only include rows where memo contains a dash
 )
-SELECT
+select
   t.exp,
   t.round,
-  ROUND(t.total * 60.0 / t.duration_sec, 2) rate_min,
-  ROUND(t.zkapps * 60.0 / t.duration_sec, 2) zkapp_rate_min,
-  ROUND((t.total - t.zkapps) * 60.0 / t.duration_sec, 2) payment_rate_min,
-  date_trunc('seconds', t.last_tx_time - t.first_tx_time) duration,
+  round(t.total * 60.0 / t.duration_sec, 2) as rate_min,
+  round(t.zkapps * 60.0 / t.duration_sec, 2) as zkapp_rate_min,
+  round((t.total - t.zkapps) * 60.0 / t.duration_sec, 2) as payment_rate_min,
+  date_trunc('seconds', t.last_tx_time - t.first_tx_time) as duration,
   t.max_latency,
-  ROUND(
+  round(
     (
       select
-        COUNT(*)
+        count(*)
       from
         txs_
       where
@@ -448,11 +450,11 @@ SELECT
         and round = t.round
     ) * 1.0 / t.total,
     2
-  ) missed,
-  ROUND(
+  ) as missed,
+  round(
     (
       select
-        COUNT(*)
+        count(*)
       from
         txs_
       where
@@ -461,11 +463,11 @@ SELECT
         and round = t.round
     ) * 1.0 / t.total,
     2
-  ) failed,
-  ROUND(
+  ) as failed,
+  round(
     (
       select
-        COUNT(*)
+        count(*)
       from
         txs_
       where
@@ -474,31 +476,31 @@ SELECT
         and round = t.round
     ) * 1.0 / t.total,
     2
-  ) successful,
-  t.first_tx_time start,
+  ) as successful,
+  t.first_tx_time as start,
   t.total,
   t.zkapps
-FROM
+from
   (
-    SELECT
+    select
       exp,
       round,
-      COUNT(*) total,
-      COUNT(nullif(type, 'payment')) zkapps,
-      MIN(time) first_tx_time,
-      MAX(time) last_tx_time,
-      MAX(latency) max_latency,
+      count(*) as total,
+      count(nullif(type, 'payment')) as zkapps,
+      min(time) as first_tx_time,
+      max(time) as last_tx_time,
+      max(latency) as max_latency,
       nullif(
         extract(
           epoch
           from
-            MAX(time) - MIN(time)
+            max(time) - min(time)
         ) :: int,
         0
-      ) duration_sec
-    FROM
+      ) as duration_sec
+    from
       txs_
-    GROUP BY
+    group by
       exp,
       round
   ) t
