@@ -417,10 +417,10 @@ from
 create
 or replace view experiments as with txs_ as (
   SELECT
-    split_part(memo, '-', 1) exp,
+    split_part(memo, '-', -2) exp,
     cast(
       nullif(
-        regexp_replace(split_part(memo, '-', 2), '[^\d]', ''),
+        regexp_replace(split_part(memo, '-', -1), '[^\d]', ''),
         ''
       ) as int
     ) round,
